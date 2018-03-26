@@ -27,3 +27,13 @@ class SaleOrder(models.Model):
         'Due Date', default=_get_due_date, copy=False,
         help='Due date to finish this sale order, the value is calculated '
         'with the today date + days configured in Settings/Sales')
+
+
+    @api.model
+    def _make_invoice(self, order, lines):
+        res = super(SaleOrder, self)._make_invoice(order, lines)
+        invoice = self.env['account.invoice'].browse(res)
+        invoice.write({
+            'date_due': order.due_date,
+        })
+        return res
